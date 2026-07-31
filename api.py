@@ -14,8 +14,8 @@ class Feedback(BaseModel):
 
 
 @app.post("/feedback")
-def create_feedback(feedback: Feedback):
-    result = send_feedback(feedback)
+async def create_feedback(feedback: Feedback):
+    await send_feedback(feedback)
     return {
         "messange": "Feedback saved",
         "feedback": feedback
