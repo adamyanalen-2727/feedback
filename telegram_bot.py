@@ -1,11 +1,17 @@
-from aiogram import Bot, Dispatcher
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram import Bot, Dispatcher, Router
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from dotenv import load_dotenv
 import os
 
-TOKEN = "8812617489:AAEIdUqG5Vq4jEqYNnKN3XD18uXSF-lDWYs"
-ADMIN_ID = "1354274325"
+load_dotenv()
 
 bot = Bot(token=TOKEN)
+
+router = Router()
+
+dp = Dispatcher()
+dp.include_router(router)
+
 
 def create_feedback_keyboard():
     keyboard = InlineKeyboardMarkup(
@@ -40,3 +46,28 @@ async def send_feedback(feedback):
             text=message,
             reply_markup=create_feedback_keyboard()
             )
+
+@router.callback_query()
+async def button_click_handler(callback: CallbackQuery):
+
+    action = callback.data
+
+    if action == "approve":
+        await callback.message.answer(
+            "Feedback approved !!!"
+                )
+        print("approved")
+
+    elif action == "reject":
+        await callback.message.answer(
+            "Feedback rejected !!!"
+                )
+        print("rejected")
+
+    await callback.answer()
+
+async def start_bot():
+    print("Telegram bot started")
+    await dp.start_polling(bot)
+
+
