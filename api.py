@@ -10,7 +10,7 @@ app = FastAPI()
 class Feedback(BaseModel):
     name: str
     surname: str
-    start: int = Field(ge=1, le=5)
+    stars: int = Field(ge=1, le=5)
     comment: Optional[str] = None
 
 
