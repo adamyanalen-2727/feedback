@@ -1,18 +1,39 @@
 import uvicorn
 import asyncio
+import logging
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 from typing import Optional
 from telegram_bot import send_feedback, start_bot
+from db_connection import create_env
+from logging.handlers import RotatingFileHandler
+from pydantic import BaseModel, Field, field_validator
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    handlers=[
+        logging.StreamHandler(),
+        RotatingFileHandler(
+            "/var/log/feedback-bot/bot.log",
+            maxBytes=100_000_000,   # 10 MB
+            backupCount=5,
+        ),
+    ],
+)
+
+logger = logging.getLogger("fastapi_app")
+
+
+asyncio.run(create_env())
 
 app = FastAPI()
 
 class Feedback(BaseModel):
-    name: str
-    surname: str
+    name: str = Field(min_length=1)
+    surname: str = Field(min_length=1)
     stars: int = Field(ge=1, le=5)
     comment: Optional[str] = None
-
 
 @app.post("/feedback")
 async def create_feedback(feedback: Feedback):
