@@ -124,3 +124,9 @@ async def input_from_telegram(name, surname, stars, message=None):
     except Exception:
         logger.exception(f"Failed to insert feedback: name={name}, surname={surname}")
         raise
+
+async def get_feedback():
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(f"SELECT * FROM {TABLE_NAME} ORDER BY id")
+    logger.info(f"Fetched {len(rows)} feedback rows")
+    return [dict(row) for row in rows]
